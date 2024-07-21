@@ -42,3 +42,51 @@ ros2 topic list
 ```
 
 ### Package 생성
+
+- ROS2 패키지는 'Python'과 'C++' 둘 다 지원함
+- 이 때 패키지를 생성할 때 패키지 이름뿐만 아니라 build type을 지정할 수도 있고, 의존성도 지정할 수 있음
+- 주로 'C++'로 이용할 것이기 때문에 **build type**은 'CMake'로 지정
+- 패키지 이름은 'lab1_pkg'로 생성
+- 의존성과 관련된 부분은 'package.xml'에서 선언이 가능하며, build type 또한 'package.xml'에서 변경 가능함
+- 해당 패키지는 의존성으로 'ackermann_msgs'를 필요로 함
+- 여기까지 수행과정은
+
+```bash
+ros2 pkg create lab1_pkg
+or
+ros2 pkg create --build-type ament_cmake lab1_pkg
+or
+ros2 pkg create --build-type amnet_python lab1_pkg
+or
+ros2 pkg create --build-type ament_cmake lab1_pkg --dependencies ackermann_msgs
+```
+
+첫번째는 기본적인 패키지 생성 방법이고, **build type**은 기본적으로 **cmake**이며 의존성도 선언되어 있지 않음
+두번째는 **build type**을 **cmake**로 지정해주는 것이고, 이도 동일하게 의존성은 선언되어 있지 않음
+세번째는 **build type**을 **python**으로 지정해주는 것이고, 이도 동일하게 의존성은 선언되어 있지 않음
+네번째는 **build type**을 **cmake**으로 지정해주고, 의존성에 **ackermann_msgs**를 선언해줌
+
+- 결론적으로 네번째 방식을 사용을 하면 요구사항을 'package.xml'에서 추가를 안해줘도 됨
+- 'package.xml'에서 충분히 수정 가능하니 첫번째 방식을 사용하거나 오타가 나도 무방함
+- 선언한 의존성이 설치될 수 있도록 'rosdep' 명령어를 사용
+
+```bash
+rosdep install --from-paths src --ignore-src -r -y
+```
+
+- 패키지 내부에는 중복된 'src' 폴더나 불필요한 'install'이나 'build'가 없어야 함
+
+### Publisher와 Subscriber 노드 생성
+
+- 언어는 'C++' 또는 'Python' 중 원하는 것으로 작성하기
+- 여기서는 'C++' 로 먼저 작성
+
+- **첫번째 노드**
+- 'talker.cpp' 또는 'talker.py'로 작성
+- 'talker'는 'v'와 'd' 두 개의 ROS 파라미터 수신
+- 'talker'는 'speed' 필드와 'v' 파라미터가 같고, 'steering_angle' 필드와 'd' 파라미터가 같은 'AckermannDriveStamped' 메시지를 'drive'라는 이름의 토픽으로 **publish**
+
+- **두번째 노드**
+- 'relay.cpp' 또는 'relay.py'로 작성
+- 'relay'는 'drive' 토픽을 **subscribe**
+- 받은 메시지인 'speed'와 'steering_angle'을 3배 해서 'AckermannDriveStamped' 메시지를 'drive_relay'라는 이름의 토픽으로 **publish**
