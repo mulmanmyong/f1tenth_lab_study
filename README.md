@@ -127,4 +127,40 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 ```
 
--
+- 그 결과 정상 작동함을 알 수 있음
+
+### LAB1 결론
+
+- 주의해야할 점이 존재
+- 기존에 무작정 있는 코드를 작성하니 뭐가 필요한 지 잘 몰랐음
+- install에 정상적으로 설치가 되어야 **ROS**에서 인식할 수 있으므로, 이와 관련 된 부분을 특히 주의해야함
+- install구문을 CMakeLists.txt에 추가하는 법을 까먹을 시 **'Launch 파일 생성'** 부분을 다시 볼 것
+- 2024/7/20 기준으로 아직 **python**에 관한 것은 작성안함
+
+### ROS 2 커맨드
+
+- 알아두면 쓸 일이 있는 ROS2 커맨드 topic과 node가 정상적으로 작동하고 송수신 하는 지 확인할 때 주로 사용
+
+```bash
+ros2 topic list
+ros2 topic info drive
+ros2 topic echo drive
+ros2 node list
+ros2 node info talker
+ros2 node info relay
+```
+
+### 패키지 구성
+
+- 패키지 구성
+
+```txt
+- package.xml (패키지 설정 파일)
+- CMakeLists.txt (빌드 설정 파일)
+- setup.py (파이썬 패키지 설정 파일)
+- setup.cfg (파이썬 패키지 환경 설정 파일)
+- plugin.xml (RQt 플러그인 설정 파일)
+- CHANGELOG.rst( 패키지 변경로그 파일)
+- LICENSE (라이선스 파일)
+- README.md (패키지 설명 파일)
+```
