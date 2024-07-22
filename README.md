@@ -104,3 +104,27 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 ```
+
+- 그 결과 launch 파일 정상 인식 후, 실행까지 가능. 하지만 여기서 다양한 에러 발생. 에러 분석 후 수정
+- 이번에는 실행을 하고자 하는 node들을 인식하지 못하는 것에 대한 문제가 발생함.
+- 이도 launch를 인식할 수 있도록 작성한 **cpp** 코드를 인식 할 수 있도록 해야함
+
+```txt
+# Include directories
+include_directories(include)
+
+# Add executables
+add_executable(talker src/talker.cpp)
+ament_target_dependencies(talker rclcpp ackermann_msgs)
+
+add_executable(relay src/relay.cpp)
+ament_target_dependencies(relay rclcpp ackermann_msgs)
+
+# Install executables
+install(TARGETS
+  talker
+  relay
+  DESTINATION lib/${PROJECT_NAME})
+```
+
+-

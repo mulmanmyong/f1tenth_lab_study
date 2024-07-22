@@ -41,6 +41,22 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# Include directories
+include_directories(include)
+
+# Add executables
+add_executable(talker src/talker.cpp)
+ament_target_dependencies(talker rclcpp ackermann_msgs)
+
+add_executable(relay src/relay.cpp)
+ament_target_dependencies(relay rclcpp ackermann_msgs)
+
+# Install executables
+install(TARGETS
+  talker
+  relay
+  DESTINATION lib/${PROJECT_NAME})
+
 # Install launch files.
 install(DIRECTORY
   launch
