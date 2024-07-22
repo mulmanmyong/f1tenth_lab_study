@@ -16,8 +16,19 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(ackermann_msgs REQUIRED)
+foreach(PACKAGE 
+  ament_cmake 
+  ament_cmake_python
+  rclcpp
+  rclpy 
+  nav_msgs
+  ackermann_msgs
+  sensor_msgs
+  std_msgs)
+
+  find_package(${PACKAGE} REQUIRED)
+
+endforeach()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

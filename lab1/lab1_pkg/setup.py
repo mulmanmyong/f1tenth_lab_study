@@ -17,7 +17,7 @@ setup(
     maintainer='zeno',
     maintainer_email='mulmanmyong@gmail.com',
     description='lab1_pkg',
-    license='apache',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
