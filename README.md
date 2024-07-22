@@ -90,3 +90,17 @@ rosdep install --from-paths src --ignore-src -r -y
 - 'relay.cpp' 또는 'relay.py'로 작성
 - 'relay'는 'drive' 토픽을 **subscribe**
 - 받은 메시지인 'speed'와 'steering_angle'을 3배 해서 'AckermannDriveStamped' 메시지를 'drive_relay'라는 이름의 토픽으로 **publish**
+
+### Launch 파일 생성
+
+- 위에서 작성한 **publisher**와 **subscriber**를 확인하기 위해서 launch 파일을 작성해야 함
+- launch 파일 툴을 보고 그대로 작성하였으나 실패 -> 공부가 부족했다는 증거
+- launch폴더를 인식하기 위해서 CMakeLists.txt에서 install 경로에 launch 폴더를 추가하여 인식할 수 있도록 해야 함 (단, ament_package() 위에)
+
+```txt
+# Install launch files.
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+```
