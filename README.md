@@ -164,3 +164,98 @@ ros2 node info relay
 - LICENSE (라이선스 파일)
 - README.md (패키지 설명 파일)
 ```
+
+## LAB2
+
+### LAB2 목표 및 개요
+
+- LAB2에서는 **LaserScan** 메시지를 이용해서 iTTC를 계산하여 치명적인 시스템 결함에서 안전하게 하는 것을 구현하는 것
+- ROS2가 ROS1이랑 유사는 하지만
+
+```bash
+ros2 interface show <msg_name>
+```
+
+으로 메시지의 정의를 볼 수 있음
+
+- 만약 설치되어있지않으면 설치를 먼저 할 것
+
+### 사용되는 메세지
+
+#### 'LaserScan' 메시지
+
+- 유용한 field가 포함되어 있음
+- 여기서 가장 많이 사용할 필드는 'ranges'
+- 'ranges'는 방사형으로 정렬된 LiDAR의 모든 측정값을 포함하는 배열
+- 이 메시지를 통해 '/scan'토픽을 subscribe 해야함
+
+#### 'Odometry' 메시지
+
+- cars positioon, orientation, velocity 와 같은 몇가지 field를 모함하고 있는 메시지
+- 이번 LAB에서 이 메시지 유형을 조사해야함
+
+#### 'AckermannDriveStamped' 메시지
+
+- 이미 사용했던 메시지
+- 시뮬레이터나 차량을 동작시킬 때 사용함
+- 'speed' field를 0.0으로 설정해서 해당 메시지를 전송하면 차량이 멈춤
+
+### TTC 계산
+
+- Time to Collision(TTC)는 자동차가 현재의 방향과 속도를 유지한다면 장애물과 충돌하는 데 걸리는 시간을 의미
+- 우리는 차량의 현재 범위 측정과 속도 측정에서 계산된 순간 범위 대 범위 비율인 iTTC를 사용하여 충돌까지의 시간을 근사화
+- 계산 식은 아래와 같음
+  $$ iTTC=\frac{r}{\lbrace- \dot{r}\rbrace\_{+}} $$
+- $r$는 순간 범위 측정이고 $\dot{r}$는 해당 측정의 현재 범위 속도
+- 연산자 $\lbrace \rbrace_{+}$는 $\lbrace x\rbrace_{+} = \text{max}(x, 0)$로 정의
+- 장애물에 대한 순간 범위 $r$는 'LaserScan' 메시지의 전류 측정값을 사용
+- 범위 비율 $\dot{r}$은 각 스캔 빔을 따라 예상되는 변화율, 양의 범위 비율은 범위 측정이 확장 중임을 의미, 음의 range rate는 범위 측정이 축소 중임을 의미
+
+**계산방식**
+
+1. $v_x \cos{\theta_{i}}$를 사용하여 각 스캔 빔의 각도에 차량의 현재 종방향 속도를 매핑하여 계산가능. range rate를 양이나 음의 값 할당에 주의. 각도는 'LaserScan' 메시지의 정보에 따라 결정가능, 차량이 현재 속도를 유지하고 장애물이 유지할 경우 측정값이 얼마나 변하는 지를 나타내는 것으로 해석 가능
+2. 이전 범위 측정과 현재의 차이를 취하여 그 사이에 시간이 얼마나 흘렀는지를 나누고 범위 비율을 계산할 수 있음 (timestamp는 메시지 헤더에 사용 가능)
+
+**계산 시 주의할 점**
+계산에서 negation은 범위 측정이 감소해야하는 지 증가해야하는 지를 올바르게 해석하기 위한 것. 장애물을 향해 전방으로 이동하는 차량의 경우 범위 측정이 축소되어야 하므로 차량 바로 앞에 있는 beam의 range rate는 음수여야 함. 그 반대의 경우 범위 측정이 증가해야 하므로 장애물에서 멀리 이동하는 차량의 range rate는 양수여야 함. operator가 제자리에 있으므로 iTTC계산은 의미가 있는 것임. range rate가 양수가 되면 operator는 그 각도에 대한 iTTC가 무한대로 가는 지 확인해야 함.
+
+**계산이 끝난 후**
+계산을 마친 후에는 각 각도에 해당하는 iTTC의 배열로 끝나야 함. 충돌까지의 시간이 특정 임계값(threshold) 아래오 떨어지면 충돌이 임박했음을 의미
+
+### iTTC를 이용한 Automatic Emergency Braking
+
+- ROS2 노드로 'LaserScan'과 'Odometry'를 subscribe
+- 필요하다면 speed field를 0.0으로 설정을 해서 브레이크 동작을 함께 'AckermannDriveStamped' 메시지를 publish
+- 이후 iTTC의 배열을 계산해야하고, 이 정보를 어떻게 처리할 지 정해야함
+- 어떻게 임계값을 결정하고, 충돌이 임박하지 않은 경우 브레이크를 밟는 가장 좋은 방법을 결정해야함
+- 배열에 포함된 'inf'나 'nan'도 처리해야함 (무한이나 공백)
+
+- 테스트를 위해서는 simulation환경이니 simulation이 true로 되어 있는 것들로 테스트를 하고, 키보드로 조작하는 코드도 실행시켜 주행 중 위험에 대비할 것
+- subscriber와 publisher로 사용할 각 메시지의 노드는
+
+```txt
+- 'LaserSacn': /scan
+- 'Odometry': /ego_racevar/odom, 구체적으로 차량의 종방향 속도는 'twist.twist.linear.x'에서 확인가능
+- 'AckermannDriveStamped': /drive
+```
+
+### 구현해보기
+
+- 시뮬레이션 환경은 f1tenth_gym_ros에서 가져와서 활용
+- 해당 파일에서 수정해야할 사항 config/sim.yaml에서 맵을 읽어오는 디렉토리 수정
+- ROS2를 구동하는 환경에서 f1tenth에서 제공해주는 f1tenth_gym git clone해서 gym 이용에 도움을 주는 라이브러리 설치
+
+```bash
+cd ~/
+git clone https://github.com/f1tenth/f1tenth_gym
+cd ~/f1tenth_gym && pip3 install -e .
+```
+
+- 그 후 시뮬레이션 환경 실행해보기
+
+```bash
+cd ~/f1tenth_labs/
+ros2 launch f1tenth_gym_ros gym_bridge_launch.py
+```
+
+하면 시뮬레이션 정상적으로 구성 완료함을 알 수 있음
