@@ -259,3 +259,7 @@ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 ```
 
 하면 시뮬레이션 정상적으로 구성 완료함을 알 수 있음
+
+- 근데 깃허브 공부도 착실히 해야할 듯. github에서도 지우고 local에서도 지우고 하면서 동시에 pull/push를 했더니 꼬임 주의할 것
+- 시뮬레이션 구성을 완료하였으니 위에서 확인한 topic을 이용하여 subscribe와 publish하는 것을 safety_node에 작성
+- sensor msgs의 대부분의 변수타입 float, std::vector<float>..

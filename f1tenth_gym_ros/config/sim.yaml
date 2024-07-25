@@ -42,13 +42,8 @@ bridge:
     scan_beams: 1080
 
     # map parameters
-<<<<<<< Updated upstream:f1tenth_gym_ros/config/sim.yaml
     map_path: "/home/kim/f1tenth_labs/src/f1tenth_lab_study/f1tenth_gym_ros/maps/levine"
     map_img_ext: ".png"
-=======
-    map_path: '/home/kim/f1tenth_labs/src/f1tenth_lab_study/f1tenth_gym/maps/levine'
-    map_img_ext: '.png'
->>>>>>> Stashed changes:f1tenth_gym/config/sim.yaml
 
     # opponent parameters
     num_agent: 1
