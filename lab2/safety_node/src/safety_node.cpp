@@ -26,6 +26,12 @@ public:
 
         // subscribe '/scan' topic, use lase_scan message
         scan_subscriber_ = this->create_subscription < sensor_msgs::msg::LaserScan("/scan", 10, std::bind(&Safety::scan_callback, this, std::placeholders::_1));
+
+        // subscrive 'ego_racecar/odom' topic, by f1tenth_gym
+        odom_subscriber_ = this->create_subscription < senson_msgs::msg::Odometry("/ego_racecar/odom", 10, std::bind(&safety::drive_callback, this, std::placeholders::_1));
+
+        // publish '/drive/ topic, use AckermannDriveStamped
+        publisher_ = this->create_publisher < ackermann_msgs::msg::AckermannDriveStamped("/drive", 10);
     }
 
 private:
@@ -35,11 +41,19 @@ private:
     void drive_callback(const nav_msgs::msg::Odometry::ConstSharedPtr msg)
     {
         /// TODO: update current speed
+        speed = msg->twist.twist.linear.x; // speed field in ac
     }
 
     void scan_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
     {
         /// TODO: calculate TTC
+        float angle_min = scan_msg->angle_min; // angle_min to angle increment
+        float angle_increment = scan_msg->angle_increment;
+        const std::vector<float> &ranges = scan_msg->ranges;
+
+        for (int i = 0; i < ranges.size(); i++)
+        {
+        }
 
         /// TODO: publish drive/brake message
     }
