@@ -32,7 +32,7 @@ public:
         scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&Safety::scan_callback, this, std::placeholders::_1));
 
         // subscrive 'ego_racecar/odom' topic, by f1tenth_gym
-        odom_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>("/ego_racecar/odom", 10, std::bind(&safety::drive_callback, this, std::placeholders::_1));
+        odom_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>("/ego_racecar/odom", 10, std::bind(&Safety::drive_callback, this, std::placeholders::_1));
 
         // publish '/drive/ topic, use AckermannDriveStamped
         drive_publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDriveStamped>("/drive", 10);
