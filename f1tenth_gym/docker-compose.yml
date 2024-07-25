@@ -36,8 +36,8 @@ services:
   novnc:  
     image: theasp/novnc:latest
     environment:
-      - DISPLAY_WIDTH=1728
-      - DISPLAY_HEIGHT=972
+      - DISPLAY_WIDTH=1366
+      - DISPLAY_HEIGHT=600
     ports:
       - "8080:8080"
     networks:
