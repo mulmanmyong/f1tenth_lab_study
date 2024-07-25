@@ -263,3 +263,9 @@ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 - 근데 깃허브 공부도 착실히 해야할 듯. github에서도 지우고 local에서도 지우고 하면서 동시에 pull/push를 했더니 꼬임 주의할 것
 - 시뮬레이션 구성을 완료하였으니 위에서 확인한 topic을 이용하여 subscribe와 publish하는 것을 safety_node에 작성
 - sensor msgs의 대부분의 변수타입 float, std::vector<float>..
+- iTTC 계산 방법
+- 각 레이저 빔에 대해 distance (현재 거리)와 relative_velocity (상대 속도)를 계산
+- angle_min은 첫번째 각도, 그 이후 증가한만큼 더해서 각 라이다 range 배열의 데이터마다의 각도 계산을 함 => angle
+- relative_velocity가 음수인 경우(즉, 두 물체가 가까워질 경우)에만 iTTC를 계산
+- iTTC가 가장 작은 값을 추적합니다.
+- 특정 임계값에서 정지하도록 함

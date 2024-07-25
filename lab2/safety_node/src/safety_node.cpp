@@ -54,29 +54,29 @@ private:
     void scan_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
     {
         /// TODO: calculate TTC
-        float min_ttc = std::numeric_limits<float>::infinity();
+        float min_ttc = std::numeric_limits<float>::infinity(); // value init
         for (size_t i = 0; i < scan_msg->ranges.size(); ++i)
         {
-            float distance = scan_msg->ranges[i];
-            if (distance > 0.0) // 0.0은 무한대를 의미할 수 있습니다.
+            float distance = scan_msg->ranges[i]; // 거리 확인
+            if (distance > 0.0)                   // 물체에 박진 않아야 함
             {
-                float angle = scan_msg->angle_min + i * scan_msg->angle_increment;
-                float relative_velocity = speed * std::cos(angle);
+                float angle = scan_msg->angle_min + i * scan_msg->angle_increment; // 라이다의 각도
+                float relative_velocity = speed * std::cos(angle);                 // 상대 속도
                 if (relative_velocity > 0)
                 {
-                    float ttc = distance / relative_velocity;
+                    float ttc = distance / relative_velocity; // ttc 계산
                     if (ttc < min_ttc)
                     {
-                        min_ttc = ttc;
+                        min_ttc = ttc; // 최소 ttc 계산
                     }
                 }
             }
         }
 
         /// TODO: publish drive/brake message
-        // TTC가 임계값보다 작으면 브레이크 메시지를 발행합니다.
-        float ttc_threshold = 1.0; // 임계값을 1초로 설정합니다.
-        if (min_ttc < ttc_threshold)
+        // TTC가 임계값보다 작으면 브레이크 메시지를 발행
+        float ttc_threshold = 1.0;   // 임계값을 1초로 설정
+        if (min_ttc < ttc_threshold) // 지정한 임계값보다 작으면 정지
         {
             auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();
             drive_msg.drive.speed = 0.0;
