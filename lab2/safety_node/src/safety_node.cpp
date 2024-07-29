@@ -75,7 +75,7 @@ private:
 
         /// TODO: publish drive/brake message
         // TTC가 임계값보다 작으면 브레이크 메시지를 발행
-        float ttc_threshold = 2.0;   // 임계값을 1초로 설정
+        float ttc_threshold = 2.0;   // 임계값을 2초로 설정, 해당 값 변경으로 벽과의 멈추는 시간 변경가능
         if (min_ttc < ttc_threshold) // 지정한 임계값보다 작으면 정지
         {
             auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();
