@@ -342,3 +342,4 @@ _Figure 2: Finding the future distance from the car to the wall_
 - 반시계 방향으로 주행 시에는 차량 기준 왼쪽벽을 follow, 시계 방향으로 주행 시에는 차량 기준 오른쪽벽을 follow
 
 - atan2()는 -pi에서 pi 사이의 값을 반환
+- scan_callback에서 scan_msg의 값을 받아오기 때문에 전역변수로 사용할 변수를 선언하고, 그 값을 scan_callback()에서 받아옴. 그리고 그 변수를 사용(angle_min, angle_increment)
