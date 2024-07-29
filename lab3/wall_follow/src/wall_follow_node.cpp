@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 class WallFollow : public rclcpp::Node
 {
@@ -43,7 +44,7 @@ private:
     std::string drive_topic = "/drive";
     /// TODO: create ROS subscribers and publishers
 
-    double get_range(float *range_data, double angle)
+    double get_range(vector<float> range_data, double angle)
     {
         /*
         Simple helper to return the corresponding range measurement at a given angle. Make sure you take care of NaNs and infs.
@@ -58,12 +59,12 @@ private:
 
         // TODO: implement
 
-        int index = (angle - scan_msg->angle_min) / scan_msg->angle_increment;
+        int index = (angle - scan_msg.angle_min) / scan_msg.angle_increment;
 
         return range_data[index];
     }
 
-    double get_error(float *range_data, double dist)
+    double get_error(vector<float> range_data, double dist)
     {
         /*
         Calculates the error to the wall. Follow the wall to the left (going counter clockwise in the Levine loop). You potentially will need to use get_range()
@@ -149,7 +150,7 @@ private:
         // TODO: fill in drive message and publish
         drive_msg.drive.speed = velocity;
         drive_msg.drive.steering_angle = angle;
-        dirve_publihser_->publish(drive_msg);
+        drive_publihser_->publish(drive_msg);
     }
 
     void scan_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
@@ -168,6 +169,9 @@ private:
         // TODO: actuate the car with PID
         pid_control(error, velocity);
     }
+
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
+    rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr drive_publisher_;
 };
 int main(int argc, char **argv)
 {
