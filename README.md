@@ -281,7 +281,7 @@ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 
 - PID controller는 지정된 설정 지점을 중심으로 시스템의 현재 파라미터를 유지하는 방법
 - Time Domain에서의 PID controller는 일반적으로 아래의 방정식을 가짐
-- $ u(t)=K*{p}e(t)+K*{i}\int*{0}^{t}e(t^{\prime})dt^{\prime}+K*{d}\frac{d}{dt}(e(t)) $
+  $$ u(t)=K*{p}e(t)+K*{i}\int*{0}^{t}e(t^{\prime})dt^{\prime}+K*{d}\frac{d}{dt}(e(t)) $$
 - $K_p$, $K_i$, $K_d$는 각각 세 가지 구성요소(비례, 적분, 미분)가 control output $u(t)$에 얼마나 기여하는 지 결정하는 상수
 - $u(t)$는 우리가 원하는 자동차의 조향 각도
 - error term $e(t)$는 설정점과 우리가 유지하고자 하는 parameter 사이의 차이
@@ -301,9 +301,43 @@ _Figure 1: 벽에 대한 자동차의 거리와 방향_
 
 - 레이저 스캔에서 얻은 두 거리 $a$와 $b$, 그리고 레이저 스캔 사이의 각도 $\theta$와 삼각법을 사용하여 $\alpha$를 다음과 같이 표현가능
 
-$$ \alpha={tan}^{-1}\left(\frac{a{cos}(\theta)-b}{a{sin}(\theta)}\right) $$
+  $$ \alpha={tan}^{-1}\left(\frac{a{cos}(\theta)-b}{a{sin}(\theta)}\right) $$
 
 - 그러면 $D_t$는
 
-$$D_t=b{cos}(\alpha) $$
-로 표현 가능
+  $$D_t=b{cos}(\alpha) $$
+  로 오른쪽 벽과 현재 차 사이의 현재 거리를 표현 가능
+
+- error term $e(t)$는 간단하게 원하는 거리와 실제 거리의 차이, 즉 원하는 거리가 1 meter라면 $e(t)$는 $1-D_t$가 됨
+- 현재 벽까지의 거리만 사용하면 너무 늦게 회전하여 자동차가 충돌할 수도 있음
+- 따라서 미래를 보고 일정한 예측 거리에 따라 자동차를 예상해야 함($L$이라고 함), 이 때 새로운 거리 $D_{t+1}$은
+
+  $$D_{t+1}=D_t+L{sin}(\alpha)$$
+
+![fig1](img/wall_following_lab_figure_2.png)
+
+_Figure 2: Finding the future distance from the car to the wall_
+
+- 우리의 제어 알고리즘은 VESC에 대한 조향 각도를 제공하지만 안전을 위해 코너 주위에서 자동차의 속도를 줄이고자 함
+- 속도는 조향 각도에 또는 계산된 오차에 따라 단계별로 계산할 수 있고, 각도가 점점 커짐에 따라 속도가 불연속적으로 감소함
+- 이번 실습에서 속도 제어 알고리즘의 좋은 시작점은 아래와 같음
+
+  - 조향 각도가 0도에서 10도 사이에는 1.5 m/s
+  - 조향 각도가 10도에서 20도 사이에는 1.0 m/s
+  - 그렇지 않으면 0.5 m/s
+
+- 요약하면
+  1. 두 개의 레이저 스캔(거리) a와 b를 얻음
+  2. 거리 a와 b를 사용하여 자동차의 $x$축과 오른쪽 벽 사이의 각도 $\alpha$를 계산
+  3. $\alpha$를 사용하여 현재 자동차와 벽 사이의 거리 $D_t$를 찾은 다음, $\alpha$와 $D_t$를 사용하여 벽까지의 예상 미래 거리 $D_{t+1}$를 계산
+  4. $D_{t+1}$를 위에서 설명한 PID 알고리즘을 통해 실행하여 조향 각도를 얻음
+  5. 이전 단계에서 계산한 조향 각도를 사용하여 안전한 주행 속도를 계산
+  6. 조향 각도와 주행 속도를 시뮬레이션에서 /drive 토픽에 게시
+
+### 구현해보기
+
+- Levine Hall map에서 자율적으로 주행할 수 있도록 벽따라가기를 구현
+- Levine의 내부 벽을 follow
+- 반시계 방향으로 주행 시에는 차량 기준 왼쪽벽을 follow, 시계 방향으로 주행 시에는 차량 기준 오른쪽벽을 follow
+
+- atan2()는 -pi에서 pi 사이의 값을 반환
