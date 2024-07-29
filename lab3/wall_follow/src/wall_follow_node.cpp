@@ -23,6 +23,9 @@ public:
     }
 
 private:
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
+    rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr drive_publisher_;
+
     // PID CONTROL PARAMS
     // TODO: double kp =
     // TODO: double kd =
@@ -172,9 +175,6 @@ private:
         // TODO: actuate the car with PID
         pid_control(error, velocity);
     }
-
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
-    rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr drive_publisher_;
 };
 int main(int argc, char **argv)
 {
