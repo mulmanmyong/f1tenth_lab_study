@@ -65,7 +65,7 @@ private:
         */
 
         // TODO: implement
-        int index = (angle - scan_msg->angle_min) / scan_msg->angle_increment;
+        int index = (angle - angle_min) / angle_increment;
 
         return range_data[index];
     }
