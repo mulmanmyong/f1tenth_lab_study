@@ -1,12 +1,14 @@
-#include "rclcpp/rclcpp.hpp"
 #include <string>
+#include <cmath>
+#include <ctime>
+#include <vector>
+
+#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "ackermann_msgs/msg/ackermann_drive_stamped.hpp"
 
-#include <cmath>
-#include <ctime>
-#include <vector>
+using namespace std;
 
 class WallFollow : public rclcpp::Node
 {
@@ -15,7 +17,7 @@ public:
     WallFollow() : Node("wall_follow_node")
     {
         // TODO: create ROS subscribers and publishers
-        scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&Safety::scan_callback, this, std::placeholders::_1));
+        scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&WallFollow::scan_callback, this, std::placeholders::_1));
 
         drive_publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDriveStamped>("/drive", 10);
     }
@@ -59,7 +61,8 @@ private:
 
         // TODO: implement
 
-        int index = (angle - scan_msg.angle_min) / scan_msg.angle_increment;
+        const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg;
+        int index = (angle - scan_msg->angle_min) / scan_msg->angle_increment;
 
         return range_data[index];
     }
@@ -150,7 +153,7 @@ private:
         // TODO: fill in drive message and publish
         drive_msg.drive.speed = velocity;
         drive_msg.drive.steering_angle = angle;
-        drive_publihser_->publish(drive_msg);
+        drive_publisher_->publish(drive_msg);
     }
 
     void scan_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
@@ -164,8 +167,8 @@ private:
         Returns:
             None
         */
-        double error = get_error(scan_msg.ranges, 1.0); // TODO: replace with error calculated by get_error()
-        double velocity = 0.0;                          // TODO: calculate desired car velocity based on error
+        double error = get_error(scan_msg->ranges, 1.0); // TODO: replace with error calculated by get_error()
+        double velocity = 0.0;                           // TODO: calculate desired car velocity based on error
         // TODO: actuate the car with PID
         pid_control(error, velocity);
     }
