@@ -17,15 +17,12 @@ public:
     WallFollow() : Node("wall_follow_node")
     {
         // TODO: create ROS subscribers and publishers
-        scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&WallFollow::scan_callback, this, std::placeholders::_1));
+        scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>(lidarscan_topic, 10, std::bind(&WallFollow::scan_callback, this, std::placeholders::_1));
 
-        drive_publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDriveStamped>("/drive", 10);
+        drive_publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDriveStamped>(drive_topic, 10);
     }
 
 private:
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
-    rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr drive_publisher_;
-
     // PID CONTROL PARAMS
     // TODO: double kp =
     // TODO: double kd =
@@ -48,7 +45,12 @@ private:
     std::string lidarscan_topic = "/scan";
     std::string drive_topic = "/drive";
     /// TODO: create ROS subscribers and publishers
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
+    rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr drive_publisher_;
 
+    // scan_msg field init
+    float angle_min = 0.0;
+    float angle_increment = 0.0;
     double get_range(vector<float> range_data, double angle)
     {
         /*
@@ -63,8 +65,6 @@ private:
         */
 
         // TODO: implement
-
-        const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg;
         int index = (angle - scan_msg->angle_min) / scan_msg->angle_increment;
 
         return range_data[index];
@@ -170,6 +170,11 @@ private:
         Returns:
             None
         */
+
+        // scan_msg field 값 받아오기
+        angle_min = scan_msg->angle_min;
+        angle_increment = scan_msg->angle_increment;
+
         double error = get_error(scan_msg->ranges, 1.0); // TODO: replace with error calculated by get_error()
         double velocity = 0.0;                           // TODO: calculate desired car velocity based on error
         // TODO: actuate the car with PID
