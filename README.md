@@ -281,7 +281,7 @@ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 
 - PID controller는 지정된 설정 지점을 중심으로 시스템의 현재 파라미터를 유지하는 방법
 - Time Domain에서의 PID controller는 일반적으로 아래의 방정식을 가짐
-- $$ u(t)=K*{p}e(t)+K*{i}\int*{0}^{t}e(t^{\prime})dt^{\prime}+K*{d}\frac{d}{dt}(e(t)) $$
+- $ u(t)=K*{p}e(t)+K*{i}\int*{0}^{t}e(t^{\prime})dt^{\prime}+K*{d}\frac{d}{dt}(e(t)) $
 - $K_p$, $K_i$, $K_d$는 각각 세 가지 구성요소(비례, 적분, 미분)가 control output $u(t)$에 얼마나 기여하는 지 결정하는 상수
 - $u(t)$는 우리가 원하는 자동차의 조향 각도
 - error term $e(t)$는 설정점과 우리가 유지하고자 하는 parameter 사이의 차이
@@ -293,12 +293,17 @@ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 - **벽까지의 거리를 어떻게 측정하고, 언제 측정을 하는가?**
 - 현재 시간 $t$에서 오른쪽 벽까지의 거리($D_t$)를 고려
 - 자동차와 오른쪽 벽 사이의 일반적인 각도를 고려하고, 자동차의 x축과 벽을 따라가는 방향 축 사이의 각도를 $\alpha$라 가정 -> 2개의 Laser Scan(거리)를 얻을 것
-- 하나는 x축에서 오른쪽으로 90도 (그림의 b), 다른 하나는 첫 번째 빔에 대해 \theta$ ( $0<\theta\leq70$ 도) 각도로 배치
+- 하나는 x축에서 오른쪽으로 90도 (그림의 b), 다른 하나는 첫 번째 빔에 대해 $\theta$ ( $0<\theta\leq70$ 도) 각도로 배치
 - 이를 통해 2개의 Laser Scan은 각각 거리 a와 b를 반환
-  ![fig1](lab3/img/wall_following_lab_figure_1.png)
 
-  _Figure 1: 벽에 대한 자동차의 거리와 방향_
+![fig1](lab3/img/wall_following_lab_figure_1.png)
+_Figure 1: 벽에 대한 자동차의 거리와 방향_
 
 - 레이저 스캔에서 얻은 두 거리 $a$와 $b$, 그리고 레이저 스캔 사이의 각도 $\theta$와 삼각법을 사용하여 $\alpha$를 다음과 같이 표현가능
-  $$ \alpha={tan}^{-1}\left(\frac{a{cos}(\theta)-b}{a{sin}(\theta)}\right) $$
-- 그러면 $D_t$는 $ D_t=b{cos}(\alpha) $로 표현 가능
+
+$$ \alpha={tan}^{-1}\left(\frac{a{cos}(\theta)-b}{a{sin}(\theta)}\right) $$
+
+- 그러면 $D_t$는
+
+$$D_t=b{cos}(\alpha) $$
+로 표현 가능
