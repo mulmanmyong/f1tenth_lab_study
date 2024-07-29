@@ -11,7 +11,7 @@ A PID controller is a way to maintain certain parameters of a system around a sp
 
 The general equation for a PID controller in the time domain, as discussed in lecture, is as follows:
 
-$$ u(t)=K_{p}e(t)+K_{i}\int_{0}^{t}e(t^{\prime})dt^{\prime}+K_{d}\frac{d}{dt}(e(t)) $$
+$$ u(t)=K*{p}e(t)+K*{i}\int*{0}^{t}e(t^{\prime})dt^{\prime}+K*{d}\frac{d}{dt}(e(t)) $$
 
 Here, $K_p$, $K_i$, and $K_d$ are constants that determine how much weight each of the three components (proportional, integral, derivative) contribute to the control output $u(t)$. $u(t)$ in our case is the steering angle we want the car to drive at. The error term $e(t)$ is the difference between the set point and the parameter we want to maintain around that set point.
 
@@ -22,25 +22,24 @@ one 90 degrees to the right of the car's x-axis (beam b in the figure), and one 
 
 ![fig1](img/wall_following_lab_figure_1.png)
 
-*Figure 1: Distance and orientation of the car relative to the wall*
+_Figure 1: Distance and orientation of the car relative to the wall_
 
 Using the two distances $a$ and $b$ from the laser scan, the angle $\theta$ between the laser scans, and some trigonometry, we can express $\alpha$ as
 
 $$ \alpha=\mbox{tan}^{-1}\left(\frac{a\mbox{cos}(\theta)-b}{a\mbox{sin}(\theta)}\right) $$
 
-We can then express $D_t$ as 
+We can then express $D_t$ as
 
 $$ D_t=b\mbox{cos}(\alpha) $$
 
 to get the current distance between the car and the right wall. What's our error term $e(t)$, then? It's simply the difference between the desired distance and actual distance! For example, if our desired distance is 1 meter from the wall, then $e(t)$ becomes $1-D_t$.
-	
 However, we have a problem on our hands. Remember that this is a race: your car will be traveling at a high speed and therefore will have a non-instantaneous response to whatever speed and servo control you give to it. If we simply use the current distance to the wall, we might end up turning too late, and the car may crash. Therefore, we must look to the future and project the car ahead by a certain lookahead distance (let's call it $L$). Our new distance $D_{t+1}$ will then be
 
 $$D_{t+1}=D_t+L\mbox{sin}(\alpha)$$
 
 ![fig1](img/wall_following_lab_figure_2.png)
 
-*Figure 2: Finding the future distance from the car to the wall*
+_Figure 2: Finding the future distance from the car to the wall_
 
 We're almost there. Our control algorithm gives us a steering angle for the VESC, but we would also like to slow the car down around corners for safety. We can compute the speed in a step-like fashion based on the steering angle, or equivalently the calculated error, so that as the angle exceeds progressively larger amounts, the speed is cut in discrete increments. For this lab, a good starting point for the speed control algorithm is:
 
