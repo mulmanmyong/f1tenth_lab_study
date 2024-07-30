@@ -343,3 +343,39 @@ _Figure 2: Finding the future distance from the car to the wall_
 
 - atan2()는 -pi에서 pi 사이의 값을 반환
 - scan_callback에서 scan_msg의 값을 받아오기 때문에 전역변수로 사용할 변수를 선언하고, 그 값을 scan_callback()에서 받아옴. 그리고 그 변수를 사용(angle_min, angle_increment)
+
+## LAB4
+
+### 목표 및 개요
+
+- 장애물 회피를 위한 반응형 방법에 대해서 학습을 함
+- f1tenth에서 Gap Follow 알고리즘이 구현이 되어있음
+- C++로도 구현 가능하고, 여러 반응형 알고리즘이나 여러 알고리즘의 조합을 시도하는 것도 권장
+- 전체 알고리즘은 python의 경우에는 120줄 정도임
+
+### F1TENTH Gap Follow
+
+- 간단하게 요약을 하면 아래의 구성을 가짐
+  1. 레이저 스캔을 얻고 전처리하기
+  2. LiDAR 범위 배열에서 가장 가까운 점을 찾기
+  3. 이 가장 가까운 점 주위에 안전 버블을 그리고 이 버블 안의 모든 점을 0으로 설정 후, 다른 0이 아닌 점들은 "갭" 또는 "자유 공간"으로 간주됨
+  4. 최대 길이의 "갭", 즉 범위 배열에서 연속된 0이 아닌 요소의 가장 큰 수를 찾기
+  5. 이 갭에서 가장 좋은 목표 지점을 찾고 단순히 이 갭에서 가장 멀리 떨어진 점이 될 수 있지만, 강의에서 설명한 "더 나은 방법"을 따르면 더 빠르게 갈 수 있음
+  6. 목표 지점을 향해 이동하도록 차량을 제어하여 /drive 토픽에 AckermannDriveStamped를 publish
+
+### 구현해보기
+
+- Gap Follow 알고리즘을 통해 **Levine Hall Map**을 자율주행 하도록 할 것
+- test를 위한 2가지 맵이 존재
+  - 평범한 주행을 위한 'levine_blocked.png'
+  - 장애물을 추가한 'levine_obs.png' -> 해당 map에서는 상대적으로 어려운 장애물들이 존재
+- 만약 simulation에서의 지도를 바꾸고자 한다면 '.png'파일과 '.yaml'파일을 'f1tenth_gym_ros/maps'에 추가를 해줘야 함
+- 그 후 'f1tenth_gym_ros/config/sim.yaml'에서 사용할 map을 변경해줘야 함
+-
+- 우선적으로 Gap Follow를 구현하기 위한 간단한 요약의 과정을 따라서 구현을 시도해보고, 잘 이해가 안될 시 추가 강의 학습
+- https://youtu.be/5asfD-_Z9x8?si=MrIAzDKzasXelqGE
+
+#### 구현방향성
+
+- 일단은 우선 lidar_callback에서 preprocess_lidar를 진행할 것, 이 때 매개변수로 scan_msg->ranges를 받아서 여기서 범위를 전처리할 것
+- 코드에서 주석으로 달면서 코드를 구현을 함
