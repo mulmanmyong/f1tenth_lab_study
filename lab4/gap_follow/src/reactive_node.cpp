@@ -58,7 +58,7 @@ private:
         }
 
         // reject high value MAX_RANGE_VALUE
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i < range_size; ++i)
         {
             if (proc_range[i] > MAX_RANGE_VALUE)
             {
@@ -70,7 +70,7 @@ private:
     }
 
     // 반환 start, end 2개 반환 pair이용
-    pair<int, int> find_max_gap(vecotr<float> ranges)
+    pair<int, int> find_max_gap(vector<float> ranges)
     {
         // Return the start index & end index of the max gap in free_space_ranges
 
@@ -83,7 +83,7 @@ private:
             {
                 if (current_start == -1)
                 {
-                    current_start == i; // 정상출력부터 시작
+                    current_start = i; // 정상출력부터 시작
                 }
             }
             else
@@ -141,7 +141,7 @@ private:
         return best_point;
     }
 
-    void lidar_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
+    void scan_callback(const sensor_msgs::msg::LaserScan::ConstSharedPtr scan_msg)
     {
         // Process each LiDAR scan as per the Follow Gap algorithm & publish an AckermannDriveStamped Message
         // 데이터 preprocess
@@ -155,7 +155,7 @@ private:
 
         // Eliminate all points inside 'bubble' (set them to zero)
         // bubble 안의 모든 점을 제거를 하는데, 이 때 점은 0으로 설정
-        int bubble_raidus = 5; // window_size와 일치
+        int bubble_radius = 5; // window_size와 일치
         int start_bubble = max(0, closet_point - bubble_radius);
         int end_bubble = min((int)proc_range.size(), closet_point + bubble_radius);
         for (int i = start_bubble; i < end_bubble; ++i)
@@ -191,7 +191,7 @@ private:
         // drive 메시지 publish
         ackermann_msgs::msg::AckermannDriveStamped drive_msg;
         drive_msg.drive.speed = velocity;
-        dirve_msg.drive.steering_angle = angle;
+        drive_msg.drive.steering_angle = angle;
         drive_publisher_->publish(drive_msg);
     }
 };
