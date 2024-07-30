@@ -6,7 +6,7 @@
 #include "ackermann_msgs/msg/ackermann_drive_stamped.hpp"
 /// CHECK: include needed ROS msg type headers and libraries
 
-#define MAX_RANGE_VALUE 2.0
+#define MAX_RANGE_VALUE 5.0
 
 using namespace std;
 
