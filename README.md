@@ -343,6 +343,8 @@ _Figure 2: Finding the future distance from the car to the wall_
 
 - atan2()는 -pi에서 pi 사이의 값을 반환
 - scan_callback에서 scan_msg의 값을 받아오기 때문에 전역변수로 사용할 변수를 선언하고, 그 값을 scan_callback()에서 받아옴. 그리고 그 변수를 사용(angle_min, angle_increment)
+- 구현을 하였을 때 오른쪽 벽을 따라가는 줄 알았지만, 왼쪽 벽간의 간격을 너무 넓게 설정을 하여 오른쪽으로 붙어가는 것으로 판단을 할 수 있음
+- 이 부분에 대해서 해결을 할 필요가 있음
 
 ## LAB4
 
@@ -379,3 +381,7 @@ _Figure 2: Finding the future distance from the car to the wall_
 
 - 일단은 우선 lidar_callback에서 preprocess_lidar를 진행할 것, 이 때 매개변수로 scan_msg->ranges를 받아서 여기서 범위를 전처리할 것
 - 코드에서 주석으로 달면서 코드를 구현을 함
+-
+- **구현 결과**
+- 7/31 현재 상황으로는 구현에는 성공을 한 듯 하지만, 오른쪽 벽과의 GAP을 계산을 하는 것으로 보임
+- 추가로 GAP의 간격이 너무 좁다고 판단. 이 GAP도 다시 지정을 해야할 듯
